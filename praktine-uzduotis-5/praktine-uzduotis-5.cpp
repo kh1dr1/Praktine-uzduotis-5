@@ -1,7 +1,6 @@
 ﻿#pragma execution_character_set("utf-8")
 
 #include <iostream>
-#include <string>
 
 using namespace std;
 
@@ -9,16 +8,16 @@ void printHelp() {
     cout << "\nKomandų sąrašas:\n\n";
 
     cout << "Pagrindinės komandos:\n";
-    cout << "input      Įvesti vienos ląstelės reikšmę\n";
-    cout << "fastinput  Įvesti lentelės reikšmes\n";
-    cout << "print      Atspausdinti lentelę\n";
-    cout << "rowsum     Apskaičiuoti kiekvienos eilutės sumą\n";
-    cout << "colsum     Apskaičiuoti kiekvieno stulpelio sumą\n";
-    cout << "max        Rasti didžiausią reikšmę lentelėje\n\n";
+    cout << "[i]: Įvesti vienos ląstelės reikšmę\n";
+    cout << "[f]: Įvesti lentelės reikšmes\n";
+    cout << "[p]: Atspausdinti lentelę\n";
+    cout << "[r]: Apskaičiuoti kiekvienos eilutės sumą\n";
+    cout << "[c]: Apskaičiuoti kiekvieno stulpelio sumą\n";
+    cout << "[m]: Rasti didžiausią reikšmę lentelėje\n\n";
 
     cout << "Pagalbinės komandos:\n";
-    cout << "h, help  Pamatyti komandų sąraša\n";
-    cout << "q, quit  Išeiti iš programos\n";
+    cout << "[h]: Pamatyti komandų sąraša\n";
+    cout << "[q]: Išeiti iš programos\n";
 }
 
 int to_real_index(int x, int y, int cols) {
@@ -36,17 +35,19 @@ void printArr(int *arr, int rows, int cols) {
 }
 
 int main() {
+    system("chcp 65001"); // utf-8
+
     int rows = 0;
     int cols = 0;
     int *arr = nullptr;
 
-    string cmd;
+    char cmd = 0;
     int x = 0;
     int y = 0;
     int val = 0;
 
-    cout << "Įveskite lentelės dydį\n";
-    cin >> rows >> cols;
+    cout << "\nĮveskite lentelės dydį (X, Y):\n";
+    cin >> cols >> rows; // Y, X
 
     if (rows < 1 || cols < 1) {
         cout << "Klaida: lentelės dydis turi būti sudarytas iš teigiamų "
@@ -63,34 +64,51 @@ int main() {
         }
     }
 
-    while (cmd != "quit" && cmd != "q") {
-        cout << "Jūsų komandą: ";
+    while (cmd != 'q') {
+        cout << "\nJūsų komandą: ";
         cin >> cmd;
 
-        if (cmd == "q" || cmd == "quit") {
-            cout << "Išeinama...\n";
-        } else if (cmd == "h" || cmd == "help") {
-            printHelp();
-        } else if (cmd == "input") {
-            cout << "Įveskite ląstelės koordinates\n";
-            cin >> x >> y;
+        switch (cmd) {
+            case 'i':
+                cout << "\nĮveskite ląstelės koordinates\n";
+                cin >> x >> y;
 
-            if (x >= 0 && x < rows && y >= 0 && y < cols) {
-                int elem = to_real_index(x, y, cols);
+                if (x >= 0 && x < rows && y >= 0 && y < cols) {
+                    int elem = to_real_index(x, y, cols);
 
-                cout << "Įveskite reikšmę\n";
-                cin >> val;
+                    cout << "\nĮveskite reikšmę\n";
+                    cin >> val;
 
-                arr[elem] = val;
-            } else {
-                cout << "Klaida: \n";
-            }
-        } else if (cmd == "print") {
-            printArr(arr, rows, cols);
-        } else {
-            cout << "Klaida: nežinoma komanda '" << cmd << "'\n";
+                    arr[elem] = val;
+                } else {
+                    cout << "Klaida: \n";
+                }
+                break;
+            case 'f':
+
+                break;
+            case 'p':
+                printArr(arr, rows, cols);
+                break;
+            case 'r':
+
+                break;
+            case 'c':
+
+                break;
+            case 'm':
+
+                break;
+            case 'h':
+                printHelp();
+                break;
+            case 'q':
+                cout << "Išeinama...\n";
+                break;
+            default:
+                cout << "Klaida: nežinoma komanda '" << cmd << "'\n";
+                break;
         }
-        
     }
 
     delete[] arr;
