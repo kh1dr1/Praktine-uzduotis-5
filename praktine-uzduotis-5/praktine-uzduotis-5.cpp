@@ -1,7 +1,11 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef _WIN32
+#pragma execution_character_set("utf-8")
+#endif // _WIN32
 
 #include <cmath>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
@@ -19,6 +23,14 @@ void printHelp() {
     cout << "Pagalbinės komandos:\n";
     cout << "[h]: Pamatyti komandų sąraša\n";
     cout << "[q]: Išeiti iš programos\n";
+}
+
+int strToInt(const string &str) {
+    stringstream ss;
+    int result = 0;
+    ss << str;
+    ss >> result;
+    return result;
 }
 
 // R = i * cols + j
@@ -63,7 +75,9 @@ void printArr(int *arr, int rows, int cols) {
 }
 
 int main() {
+#ifdef _WIN32
     system("chcp 65001"); // utf-8
+#endif // _WIN32
 
     int rows = 0;
     int cols = 0;
@@ -74,6 +88,7 @@ int main() {
     int x = 0;
     int y = 0;
     int val = 0;
+    string fi_val;
 
     int max = 0;
 
@@ -119,7 +134,19 @@ int main() {
 
                 break;
             case 'f':
+                cout << "\nĮveskite " << size << " reikšmes\n";
+                cout << "Jei norite išeiti, įveskite \"q\"\n";
+                cout << "\n---- Įvedimo pradžia ----\n";
 
+                for (int i = 0; i < size; i++) {
+                    cin >> fi_val;
+                    if (fi_val == "q")
+                        break;
+                    val = strToInt(fi_val);
+                    arr[i] = val;
+                }
+
+                cout << "---- Įvedimo pabaiga ----\n";
                 break;
             case 'p':
                 printArr(arr, rows, cols);
