@@ -134,7 +134,7 @@ int main()
 
                 arr[elem] = val;
             } else {
-                cout << "[KLAIDA] Įvestos klaidingos koordinatės\n";
+                cout << "\n[KLAIDA] Įvestos klaidingos koordinatės\n";
             }
         } else if (cmd == "fastinput" || cmd == "fi") {
             string fi_val;
@@ -156,9 +156,27 @@ int main()
         } else if (cmd == "print" || cmd == "p") {
             printArr(arr, rows, cols);
         } else if (cmd == "rowsum" || cmd == "r") {
+            for (int i = 0; i < rows; i++) {
+                int rowSum = 0;
 
+                for (int j = 0; j < cols; j++) {
+                    int elem = real_cell(i, j, cols);
+                    rowSum += arr[elem];
+                }
+
+                cout << "Eilutes nr. " << i + 1 << " suma: " << rowSum << '\n';
+            }
         } else if (cmd == "colsum" || cmd == "c") {
+            for (int j = 0; j < cols; j++) {
+                int colSum = 0;
 
+                for (int i = 0; i < rows; i++) {
+                    int elem = real_cell(i, j, cols);
+                    colSum += arr[elem];
+                }
+                
+                cout << "Stulpelio nr. " << j + 1 << " suma: " << colSum << '\n';
+            }
         } else if (cmd == "max" || cmd == "m") {
             for (int i = 0; i < size; i++) {
                 if (arr[i] > max) {
