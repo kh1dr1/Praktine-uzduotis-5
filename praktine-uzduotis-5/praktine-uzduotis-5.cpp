@@ -14,16 +14,16 @@ void printHelp()
     cout << "\nKomandų sąrašas:\n\n";
 
     cout << "Pagrindinės komandos:\n";
-    cout << "input      Įvesti vienos ląstelės reikšmę\n";
-    cout << "fastinput  Įvesti lentelės reikšmes\n";
-    cout << "print      Atspausdinti lentelę\n";
-    cout << "rowsum     Apskaičiuoti kiekvienos eilutės sumą\n";
-    cout << "colsum     Apskaičiuoti kiekvieno stulpelio sumą\n";
-    cout << "max        Rasti didžiausią reikšmę lentelėje\n\n";
+    cout << "   input, i       Įvesti vienos ląstelės reikšmę\n";
+    cout << "   fastinput, fi  Įvesti lentelės reikšmes\n";
+    cout << "   print, p       Atspausdinti lentelę\n";
+    cout << "   rowsum, r      Apskaičiuoti kiekvienos eilutės sumą\n";
+    cout << "   colsum, c      Apskaičiuoti kiekvieno stulpelio sumą\n";
+    cout << "   max, m         Rasti didžiausią reikšmę lentelėje\n\n";
 
     cout << "Pagalbinės komandos:\n";
-    cout << "help   Pamatyti komandų sąraša\n";
-    cout << "quit   Išeiti iš programos\n";
+    cout << "   help, h   Pamatyti komandų sąraša\n";
+    cout << "   quit, q   Išeiti iš programos\n";
 }
 
 int strToInt(const string &str)
@@ -35,11 +35,9 @@ int strToInt(const string &str)
     return result;
 }
 
-// R = i * cols + j
-int real_index(int x, int y, int cols) { return x * cols + y; }
+int real_cell(const int i, const int j, const int cols) { return i * cols + j; }
 
-// v_inv = rows - v - 1
-int inverseVerticalAxis(int v, int rows) { return rows - v - 1; }
+void flip_axis(int &axis, const int size) { axis = size - axis + 1; }
 
 int getCharsInNumber(int number)
 {
@@ -67,7 +65,7 @@ void printArr(int *arr, int rows, int cols)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             cout << "| ";
-            int elem = real_index(i, j, cols);
+            int elem = real_cell(i, j, cols);
             cout << arr[elem] << " ";
         }
         cout << '|' << '\n' << '+';
@@ -101,7 +99,7 @@ int main()
             break;
 
         // else
-        cout << "klaida: lentelės dydis turi būti sudarytas iš teigiamų skaičių\n";
+        cout << "[KLAIDA] Lentelės dydis turi būti sudarytas iš teigiamų skaičių\n";
     }
 
     size = rows * cols;
@@ -109,7 +107,7 @@ int main()
 
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-            int elem = real_index(i, j, cols);
+            int elem = real_cell(i, j, cols);
             arr[elem] = 0;
         }
     }
@@ -119,27 +117,27 @@ int main()
         cout << "\nJūsų komandą: ";
         cin >> cmd;
 
-        if (cmd == "input") {
+        if (cmd == "input" || cmd == "i") {
             int x = 0;
             int y = 0;
             int val = 0;
 
             cout << "\nĮveskite ląstelės koordinates (X, Y): ";
             cin >> y >> x;
-            x = inverseVerticalAxis(x, rows);
+            flip_axis(x, rows);
 
-            if (x >= 0 && x < rows && y >= 0 && y < cols) {
-                int elem = real_index(x, y, cols);
+            if (x >= 1 && x <= rows && y >= 0 && y <= cols) {
+                int elem = real_cell(x - 1, y - 1, cols);
 
                 cout << "Įveskite reikšmę: ";
                 cin >> val;
 
                 arr[elem] = val;
             } else {
-                cout << "Klaida: įvestos per didelės koordinatės\n";
+                cout << "[KLAIDA] Įvestos klaidingos koordinatės\n";
             }
-        } else if (cmd == "fastinput") {
-            string fastInputVal;
+        } else if (cmd == "fastinput" || cmd == "fi") {
+            string fi_val;
             int val = 0;
 
             cout << "\nĮveskite " << size << " reikšmes\n";
@@ -147,35 +145,35 @@ int main()
             cout << "\n---- Įvedimo pradžia ----\n";
 
             for (int i = 0; i < size; i++) {
-                cin >> fastInputVal;
-                if (fastInputVal == "q")
+                cin >> fi_val;
+                if (fi_val == "q")
                     break;
-                val = strToInt(fastInputVal);
+                val = strToInt(fi_val);
                 arr[i] = val;
             }
 
             cout << "---- Įvedimo pabaiga ----\n";
-        } else if (cmd == "print") {
+        } else if (cmd == "print" || cmd == "p") {
             printArr(arr, rows, cols);
-        } else if (cmd == "rowsum") {
+        } else if (cmd == "rowsum" || cmd == "r") {
 
-        } else if (cmd == "colsum") {
+        } else if (cmd == "colsum" || cmd == "c") {
 
-        } else if (cmd == "max") {
+        } else if (cmd == "max" || cmd == "m") {
             for (int i = 0; i < size; i++) {
                 if (arr[i] > max) {
                     max = arr[i];
                 }
             }
             cout << "Didžiausia reikšmė lentelėje: " << max << '\n';
-        } else if (cmd == "help") {
+        } else if (cmd == "help" || cmd == "h") {
             printHelp();
-        } else if (cmd == "quit") {
-            cout << "Išeinama...\n";
+        } else if (cmd == "quit" || cmd == "q") {
+            cout << "\nIšeinama...\n";
             keepRunning = false;
         } else {
-            cout << "klaida: nežinoma komanda " << cmd << '\n';
-            cout << "Jei norite pamatyti komandų sąrašą, pasakykite: help\n";
+            cout << "\n[KLAIDA] Nežinoma komanda: " << cmd << '\n';
+            cout << "[INFO] Jei norite pamatyti komandų sąrašą, pasakykite: help\n";
         }
     }
 
