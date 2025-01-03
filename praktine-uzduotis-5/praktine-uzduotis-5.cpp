@@ -76,6 +76,111 @@ void printArr(int *arr, int rows, int cols)
     }
 }
 
+struct Contact {
+    string name;
+    string surname;
+    int phone_number;
+    int birth_year; // yyyy
+    int birth_month; // MM
+    int birth_day; // dd
+};
+
+bool intInRange(int number, int min, int max)
+{
+    return number >= min && number <= max;
+}
+
+void program_2()
+{
+    string cmd;
+    size_t numContacts = 5;
+    size_t lastContactNum = 0;
+    Contact* contactList = new Contact[numContacts];
+
+    while (true) {
+        cout << "\nJūsų komandą: ";
+        cin >> cmd;
+
+        if (cmd == "list" || cmd == "ls") {
+            cout << "\nKontaktai:\n";
+
+            for (size_t i = 0; i < numContacts; i++) {
+                Contact& contact = contactList[i];
+                cout << "\nKontaktas #" << i + 1 << '\n';
+                cout << "\tName: " << contactList[i].name << '\n';
+                cout << "\tSurname: " << contactList[i].surname << '\n';
+                cout << "\tPhone number: " << contactList[i].phone_number << '\n';
+                cout << "\tBirth date: " << contactList[i].birth_year << '\n';
+            }
+        } else if (cmd == "add") {
+            string name;
+            string surname;
+            int phone_number;
+            int birth_year;
+            int birth_month;
+            int birth_day;
+
+            cout << "Iveskite naujo kontakto duomenis:\n";
+            cout << "\tVardas: "; cin >> name;
+            cout << "\tPavarde: "; cin >> surname;
+            cout << "\tTelefono numeris: "; cin >> phone_number;
+
+            while (true) {
+                cout << "\tGimimo metai (1900-2100): ";
+                cin >> birth_year;
+
+                if (intInRange(birth_year, 1900, 2100)) {
+                    break;
+                }
+
+                cout << "\n[KLAIDA] Gimimo metai turi buti tarp 1900 ir 2100 metu\n\n";
+            }
+
+            while (true) {
+                cout << "\tGimimo menesis (1-12): ";
+                cin >> birth_month;
+
+                if (intInRange(birth_month, 1, 12)) {
+                    break;
+                }
+
+                cout << "\n[KLAIDA] Gimimo menesis turi buti skaiciu tarp 1 ir 12\n\n";
+            }
+
+            while (true) {
+                cout << "\tGimimo diena (1-31 | 1-28): ";
+                cin >> birth_day;
+
+                int maxDay = 31;
+
+                if (birth_month == 2) {
+                    maxDay = 28;
+                }
+
+                if (intInRange(birth_day, 1, maxDay)) {
+                    break;
+                }
+
+                cout << "\n[KLAIDA] Gimimo diena turi buti skaiciu tarp 1 ir " << maxDay << "\n\n";
+            }
+
+            // to do: if (lastContactNum == numContacts + 1)
+
+            contactList[lastContactNum] = Contact{name, surname, phone_number, birth_year, birth_month, birth_day};
+            lastContactNum++;
+        } else if (cmd == "delete" || cmd == "del") {
+            cout << "INFO: to do\n";
+        } else if (cmd == "quit" || cmd == "q") {
+            cout << "\nIšeinama...\n";
+            delete[] contactList;
+            return;
+        } else {
+            cout << "\n[KLAIDA] Nežinoma komanda: " << cmd << '\n';
+            cout << "[INFO] Jei norite pamatyti komandų sąrašą, pasakykite: help\n";
+        }
+    }
+}
+
 int main()
 {
 #ifdef _WIN32
