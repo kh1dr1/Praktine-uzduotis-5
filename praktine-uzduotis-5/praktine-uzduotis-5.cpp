@@ -2,13 +2,18 @@
 #pragma execution_character_set("utf-8")
 #endif // _WIN32
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <string_view>
 
 using namespace std;
 
+void printMsg(string_view type, string_view text) { cout << "\n[" << type << "] " << text << '\n'; }
+
+// prog_1
 void printHelp()
 {
     cout << "\nKomandų sąrašas:\n\n";
@@ -26,7 +31,7 @@ void printHelp()
     cout << "   quit, q   Išeiti iš programos\n";
 }
 
-int strToInt(const string &str)
+int strToInt(const string& str)
 {
     stringstream ss;
     int result = 0;
@@ -37,7 +42,7 @@ int strToInt(const string &str)
 
 int real_cell(const int i, const int j, const int cols) { return i * cols + j; }
 
-void flip_axis(int &axis, const int size) { axis = size - axis + 1; }
+void flip_axis(int& axis, const int size) { axis = size - axis + 1; }
 
 int getCharsInNumber(int number)
 {
@@ -54,7 +59,7 @@ int getCharsInNumber(int number)
     return static_cast<int>(log10(number)) + 1 + (int)result;
 }
 
-void printArr(int *arr, int rows, int cols)
+void printArr(int* arr, int rows, int cols)
 {
     cout << '\n' << '+';
     for (int x = 0; x < cols; x++) {
@@ -79,118 +84,146 @@ void printArr(int *arr, int rows, int cols)
 struct Contact {
     string name;
     string surname;
-    int phone_number;
-    int birth_year; // yyyy
-    int birth_month; // MM
-    int birth_day; // dd
+    int phone_number{};
+    int birth_year{}; // yyyy
+    int birth_month{}; // MM
+    int birth_day{}; // dd
 };
 
-bool intInRange(int number, int min, int max)
+string toDateString(int year, int month, int day)
 {
-    return number >= min && number <= max;
+    ostringstream oss;
+    oss << year << '-' << month << '-' << day;
+    return oss.str();
 }
 
-void program_2()
+void printContact(const Contact& contact, int ID)
+{
+    cout << "\nKontaktas nr. " << ID << ":\n";
+    cout << "\tVardas: " << contact.name << '\n';
+    cout << "\tPavarde: " << contact.surname << '\n';
+    cout << "\tTelefono num.: " << contact.phone_number << '\n';
+    cout << "\tGimimo data: " << toDateString(contact.birth_year, contact.birth_month, contact.birth_day) << '\n';
+}
+
+bool intInRange(int number, int min, int max) { return number >= min && number <= max; }
+
+// operacijos: add, print, delete, edit
+/*void cl_init(Contact* list, size_t size)
+{
+    for (size_t i = 0; i < size; i++) {
+        list[i] = Contact{};
+    }
+}*/
+
+void cl_resize(Contact* list, size_t& size)
+{
+    if (size == 0) {
+        size = 1;
+    };
+
+    size_t newSize = size * 2;
+    Contact* newList = new Contact[newSize];
+
+    copy(list, list + size, newList);
+    delete[] list;
+
+    list = newList;
+    size = newSize;
+}
+
+void cl_add(Contact* list, size_t& size, size_t& lastIndex, Contact& contact)
+{
+    if (lastIndex >= size) {
+        cl_resize(list, size);
+    }
+
+    list[lastIndex] = contact;
+    lastIndex++;
+}
+
+void cl_print(Contact* list, size_t size)
+{
+    cout << "\nKontaktai:\n";
+    for (size_t i = 0; i < size; i++) {
+        printContact(list[i], i + 1);
+    }
+}
+
+int getValidIntInput(int min, int max, string_view msg)
+{
+    int input = 0;
+
+    while (true) {
+        cout << '\t' << msg << " (nuo " << min << " iki " << max << "): ";
+        cin >> input;
+
+        if (intInRange(input, min, max)) {
+            break;
+        }
+
+        cout << "\n[KLAIDA] Ivestas klaidingas skaicius\n\n";
+    }
+
+    return input;
+}
+
+void prog_2()
 {
     string cmd;
-    size_t numContacts = 5;
+    size_t numContacts = 0;
     size_t lastContactNum = 0;
-    Contact* contactList = new Contact[numContacts];
+    Contact* contactList = nullptr;
 
     while (true) {
         cout << "\nJūsų komandą: ";
         cin >> cmd;
 
         if (cmd == "list" || cmd == "ls") {
-            cout << "\nKontaktai:\n";
-
-            for (size_t i = 0; i < numContacts; i++) {
-                Contact& contact = contactList[i];
-                cout << "\nKontaktas #" << i + 1 << '\n';
-                cout << "\tName: " << contactList[i].name << '\n';
-                cout << "\tSurname: " << contactList[i].surname << '\n';
-                cout << "\tPhone number: " << contactList[i].phone_number << '\n';
-                cout << "\tBirth date: " << contactList[i].birth_year << '\n';
-            }
+            cl_print(contactList, numContacts);
         } else if (cmd == "add") {
-            string name;
-            string surname;
-            int phone_number;
-            int birth_year;
-            int birth_month;
-            int birth_day;
+            string name, surname;
+            int phone_number, birth_year, birth_month, birth_day;
 
             cout << "Iveskite naujo kontakto duomenis:\n";
-            cout << "\tVardas: "; cin >> name;
-            cout << "\tPavarde: "; cin >> surname;
-            cout << "\tTelefono numeris: "; cin >> phone_number;
 
-            while (true) {
-                cout << "\tGimimo metai (1900-2100): ";
-                cin >> birth_year;
+            cout << "\tVardas: ";
+            cin >> name;
 
-                if (intInRange(birth_year, 1900, 2100)) {
-                    break;
-                }
+            cout << "\tPavarde: ";
+            cin >> surname;
 
-                cout << "\n[KLAIDA] Gimimo metai turi buti tarp 1900 ir 2100 metu\n\n";
-            }
+            cout << "\tTelefono numeris: ";
+            cin >> phone_number;
 
-            while (true) {
-                cout << "\tGimimo menesis (1-12): ";
-                cin >> birth_month;
+            birth_year = getValidIntInput(1900, 2100, "Gimimo metai");
+            birth_month = getValidIntInput(1, 12, "Gimimo menesis");
 
-                if (intInRange(birth_month, 1, 12)) {
-                    break;
-                }
+            int maxDay = birth_month == 2 ? 28 : 31;
+            birth_day = getValidIntInput(1, maxDay, "Gimimo diena");
 
-                cout << "\n[KLAIDA] Gimimo menesis turi buti skaiciu tarp 1 ir 12\n\n";
-            }
-
-            while (true) {
-                cout << "\tGimimo diena (1-31 | 1-28): ";
-                cin >> birth_day;
-
-                int maxDay = 31;
-
-                if (birth_month == 2) {
-                    maxDay = 28;
-                }
-
-                if (intInRange(birth_day, 1, maxDay)) {
-                    break;
-                }
-
-                cout << "\n[KLAIDA] Gimimo diena turi buti skaiciu tarp 1 ir " << maxDay << "\n\n";
-            }
-
-            // to do: if (lastContactNum == numContacts + 1)
-
-            contactList[lastContactNum] = Contact{name, surname, phone_number, birth_year, birth_month, birth_day};
-            lastContactNum++;
+            Contact newContact{name, surname, phone_number, birth_year, birth_month, birth_day};
+            cl_add(contactList, numContacts, lastContactNum, newContact);
         } else if (cmd == "delete" || cmd == "del") {
             cout << "INFO: to do\n";
         } else if (cmd == "quit" || cmd == "q") {
             cout << "\nIšeinama...\n";
-            delete[] contactList;
-            return;
+            break;
         } else {
             cout << "\n[KLAIDA] Nežinoma komanda: " << cmd << '\n';
             cout << "[INFO] Jei norite pamatyti komandų sąrašą, pasakykite: help\n";
         }
     }
+
+    delete[] contactList;
 }
 
-int main()
+void prog_1()
 {
-#ifdef _WIN32
-    system("chcp 65001"); // utf-8
-#endif // _WIN32
-
     int rows = 0;
     int cols = 0;
     int size = 0;
-    int *arr = nullptr;
+    int* arr = nullptr;
 
     string cmd;
 
@@ -279,7 +312,7 @@ int main()
                     int elem = real_cell(i, j, cols);
                     colSum += arr[elem];
                 }
-                
+
                 cout << "Stulpelio nr. " << j + 1 << " suma: " << colSum << '\n';
             }
         } else if (cmd == "max" || cmd == "m") {
@@ -301,6 +334,31 @@ int main()
     }
 
     delete[] arr;
+}
+
+int main()
+{
+#ifdef _WIN32
+    system("chcp 65001"); // utf-8
+#endif // _WIN32
+
+    int progChoice = 0;
+    cout << "Pasirinkite programa:\n";
+    cout << "1: Lentelė\n";
+    cout << "2: Kontaktai\n";
+    cin >> progChoice;
+
+    switch (progChoice) {
+        case 1:
+            prog_1();
+            break;
+        case 2:
+            prog_2();
+            break;
+        default:
+            printMsg("klaida", "neteisingas pasirinkimas");
+            break;
+    }
 
     return 0;
 }
