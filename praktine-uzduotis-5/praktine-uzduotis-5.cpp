@@ -160,7 +160,7 @@ Contact* removeElem(Contact* arr, size_t& size, size_t elemNum)
     }
 
     for (size_t i = elemNum + 1; i < size; i++) {
-        newArr[i - 1] = arr[i];
+        newArr[i - 1] = arr[i]; // C6385
     }
 
     size--;
@@ -217,12 +217,12 @@ int getMaxDaysInMonth(int yearNum, int monthNum)
     return static_cast<unsigned>(last_day.day());
 }
 
-void createContact(Contact*& arr, size_t& size, size_t& last)
+Contact getContactInput(sv msg = "")
 {
     string name, surname;
-    int phone_number;
+    int phoneNum;
 
-    cout << "\nĮveskite naujo kontakto duomenis:\n";
+    cout << "\nĮveskite " << msg << " kontakto duomenis:\n";
 
     cout << TAB << "Vardas: ";
     cin >> name;
@@ -231,7 +231,7 @@ void createContact(Contact*& arr, size_t& size, size_t& last)
     cin >> surname;
 
     cout << TAB << "Telefono numeris: ";
-    cin >> phone_number;
+    cin >> phoneNum;
 
     int year = getValidIntInput(1900, 2100, "Gimimo metai");
     int month = getValidIntInput(1, 12, "Gimimo mėnesis");
@@ -239,7 +239,12 @@ void createContact(Contact*& arr, size_t& size, size_t& last)
     int maxDay = getMaxDaysInMonth(year, month);
     int day = getValidIntInput(1, maxDay, "Gimimo diena");
 
-    Contact newContact{name, surname, phone_number, year, month, day};
+    return Contact{name, surname, phoneNum, year, month, day};
+}
+
+void createContact(Contact*& arr, size_t& size, size_t& last)
+{
+    Contact newContact = getContactInput("naujo");
     addContactToList(arr, size, last, newContact);
 }
 
@@ -262,7 +267,22 @@ Contact* deleteContact(Contact* arr, size_t& size, size_t& last)
     return removeElem(arr, size, contactId);
 }
 
-void editContact(Contact* arr, size_t size, size_t last) { print("info", "To do.."); }
+void editContact(Contact* arr, size_t size, size_t last) { 
+    int contactId = 0;
+
+    cout << "\nĮveskite kontakto ID: ";
+    cin >> contactId;
+
+    if (contactId < 1 || contactId > last) {
+        print("klaida", "Neteisingas kontakto ID");
+        return;
+    }
+
+    Contact newData = getContactInput();
+    contactId--;
+
+    arr[contactId] = newData;
+}
 
 void prog_contacts()
 {
