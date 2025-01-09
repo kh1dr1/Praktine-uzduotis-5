@@ -14,7 +14,7 @@ using namespace std;
 using sv = string_view;
 
 const size_t INIT_CONTACT_COUNT = 10;
-const string TAB = string(' ', 2);
+const string TAB = "  ";
 
 void print(sv info, sv text, size_t LF_count = 1)
 {
@@ -117,10 +117,10 @@ string toDateString(int year, int month, int day)
 void printContact(const Contact& contact, size_t ID)
 {
     cout << "\n--- Kontakto nr. " << ID << " duomenys ---\n";
-    cout << "Vardas: " << contact.name << '\n';
-    cout << "Pavardė: " << contact.surname << '\n';
-    cout << "Telefono num.: " << contact.phone_number << '\n';
-    cout << "Gimimo data: " << toDateString(contact.birth_year, contact.birth_month, contact.birth_day) << '\n';
+    cout << TAB << "Vardas: " << contact.name << '\n';
+    cout << TAB << "Pavardė: " << contact.surname << '\n';
+    cout << TAB << "Telefono num.: " << contact.phone_number << '\n';
+    cout << TAB << "Gimimo data: " << toDateString(contact.birth_year, contact.birth_month, contact.birth_day) << '\n';
 }
 
 bool intInRange(int number, int min, int max) { return number >= min && number <= max; }
@@ -140,6 +140,33 @@ size_t resizeContactList(Contact*& list, const size_t& size)
 
     list = newList;
     return newSize;
+}
+
+Contact* removeElem(Contact* arr, size_t& size, size_t elemNum)
+{
+    // if (list == nullptr) { // ??
+    // ....
+
+    if (elemNum < 0 || elemNum >= size)
+    {
+        print("error", "elemNum out of range");
+        return arr;
+    }
+
+    Contact* newArr = new Contact[size - 1];
+
+    for (size_t i = 0; i < elemNum; i++) {
+        newArr[i] = arr[i];
+    }
+
+    for (size_t i = elemNum + 1; i < size; i++) {
+        newArr[i - 1] = arr[i];
+    }
+
+    size--;
+    delete[] arr;
+
+    return newArr;
 }
 
 void addContactToList(Contact*& list, size_t& size, size_t& lastIndex, Contact& contact)
@@ -190,6 +217,53 @@ int getMaxDaysInMonth(int yearNum, int monthNum)
     return static_cast<unsigned>(last_day.day());
 }
 
+void createContact(Contact*& arr, size_t& size, size_t& last)
+{
+    string name, surname;
+    int phone_number;
+
+    cout << "\nĮveskite naujo kontakto duomenis:\n";
+
+    cout << TAB << "Vardas: ";
+    cin >> name;
+
+    cout << TAB << "Pavardė: ";
+    cin >> surname;
+
+    cout << TAB << "Telefono numeris: ";
+    cin >> phone_number;
+
+    int year = getValidIntInput(1900, 2100, "Gimimo metai");
+    int month = getValidIntInput(1, 12, "Gimimo mėnesis");
+
+    int maxDay = getMaxDaysInMonth(year, month);
+    int day = getValidIntInput(1, maxDay, "Gimimo diena");
+
+    Contact newContact{name, surname, phone_number, year, month, day};
+    addContactToList(arr, size, last, newContact);
+}
+
+Contact* deleteContact(Contact* arr, size_t& size, size_t& last)
+{
+    int contactId = 0;
+    cout << "\nĮveskite kontakto ID: ";
+    cin >> contactId;
+
+    if (contactId < 1 || contactId > last) {
+        print("klaida", "Neteisingas kontakto ID");
+        return arr;
+    }
+
+    contactId--;
+
+    size--;
+    last--;
+    
+    return removeElem(arr, size, contactId);
+}
+
+void editContact(Contact* arr, size_t size, size_t last) { print("info", "To do.."); }
+
 void prog_contacts()
 {
     string cmd;
@@ -204,30 +278,11 @@ void prog_contacts()
         if (cmd == "list" || cmd == "ls") {
             printContactList(contactList, lastContactNum);
         } else if (cmd == "new" || cmd == "create" || cmd == "add") {
-            string name, surname;
-            int phone_number;
-
-            cout << "\nĮveskite naujo kontakto duomenis:\n";
-
-            cout << TAB << "Vardas: ";
-            cin >> name;
-
-            cout << TAB << "Pavarde: ";
-            cin >> surname;
-
-            cout << TAB << "Telefono numeris: ";
-            cin >> phone_number;
-
-            int year = getValidIntInput(1900, 2100, "Gimimo metai");
-            int month = getValidIntInput(1, 12, "Gimimo mėnesis");
-
-            int maxDay = getMaxDaysInMonth(year, month);
-            int day = getValidIntInput(1, maxDay, "Gimimo diena");
-
-            Contact newContact{name, surname, phone_number, year, month, day};
-            addContactToList(contactList, numContacts, lastContactNum, newContact);
+            createContact(contactList, numContacts, lastContactNum);
         } else if (cmd == "delete" || cmd == "del") {
-            cout << "INFO: to do\n";
+            contactList = deleteContact(contactList, numContacts, lastContactNum);
+        } else if (cmd == "edit") {
+            editContact(contactList, numContacts, lastContactNum);
         } else if (cmd == "help" || cmd == "h") {
             printContactsHelp();
         } else if (cmd == "quit" || cmd == "q") {
