@@ -31,6 +31,14 @@ void printHelp()
     cout << "   quit, q   Išeiti iš programos\n";
 }
 
+// main
+void printOptHelp()
+{
+    cout << "\nPasirinkite viena is siu opciju:\n";
+    cout << "  -l, --lentele     Pamatyti komandų sąraša\n";
+    cout << "  -k, --kontaktai   Išeiti iš programos\n";
+}
+
 int strToInt(const string& str)
 {
     stringstream ss;
@@ -168,7 +176,7 @@ int getValidIntInput(int min, int max, string_view msg)
     return input;
 }
 
-void prog_2()
+void kontaktu_programa()
 {
     string cmd;
     size_t numContacts = 0;
@@ -218,7 +226,7 @@ void prog_2()
     delete[] contactList;
 }
 
-void prog_1()
+void lenteles_programa()
 {
     int rows = 0;
     int cols = 0;
@@ -336,28 +344,29 @@ void prog_1()
     delete[] arr;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 #ifdef _WIN32
     system("chcp 65001"); // utf-8
 #endif // _WIN32
 
-    int progChoice = 0;
-    cout << "Pasirinkite programa:\n";
-    cout << "1: Lentelė\n";
-    cout << "2: Kontaktai\n";
-    cin >> progChoice;
+    // cout << "opt: " << argv[1] << "\n\n";
+    if (argv[1] == nullptr) {
+        printMsg("klaida", "pasirinkite opcija");
+        printOptHelp();
+        return 1;
+    }
 
-    switch (progChoice) {
-        case 1:
-            prog_1();
-            break;
-        case 2:
-            prog_2();
-            break;
-        default:
-            printMsg("klaida", "neteisingas pasirinkimas");
-            break;
+    string opt = argv[1];
+
+    if (opt == "-l" || opt == "--lentele") {
+        lenteles_programa();
+    } else if (opt == "-k" || opt == "--kontaktai") {
+        kontaktu_programa();
+    } else {
+        printMsg("klaida", "neteisingas opcijos pasirinkimas");
+        printOptHelp();
+        return 1;
     }
 
     return 0;
