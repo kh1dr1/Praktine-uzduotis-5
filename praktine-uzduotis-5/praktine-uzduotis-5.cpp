@@ -105,7 +105,7 @@ string toDateString(int year, int month, int day)
     return oss.str();
 }
 
-void printContact(const Contact& contact, int ID)
+void printContact(const Contact& contact, size_t ID)
 {
     cout << "\nKontaktas nr. " << ID << ":\n";
     cout << "\tVardas: " << contact.name << '\n';
@@ -126,15 +126,21 @@ bool intInRange(int number, int min, int max) { return number >= min && number <
 
 void cl_resize(Contact* list, size_t& size)
 {
+    const size_t originalSize = size;
+
     if (size == 0) {
-        size = 1;
+        size = 1; // 5? 10?
     };
 
     size_t newSize = size * 2;
     Contact* newList = new Contact[newSize];
 
-    copy(list, list + size, newList);
-    delete[] list;
+    if (originalSize == 0) {
+
+    } else {
+        copy(list, list + size, newList); // error: segfault
+        delete[] list;
+    }
 
     list = newList;
     size = newSize;
@@ -191,7 +197,7 @@ void kontaktu_programa()
             cl_print(contactList, numContacts);
         } else if (cmd == "add") {
             string name, surname;
-            int phone_number, birth_year, birth_month, birth_day;
+            int phone_number;
 
             cout << "Iveskite naujo kontakto duomenis:\n";
 
@@ -204,11 +210,11 @@ void kontaktu_programa()
             cout << "\tTelefono numeris: ";
             cin >> phone_number;
 
-            birth_year = getValidIntInput(1900, 2100, "Gimimo metai");
-            birth_month = getValidIntInput(1, 12, "Gimimo menesis");
+            int birth_year = getValidIntInput(1900, 2100, "Gimimo metai");
+            int birth_month = getValidIntInput(1, 12, "Gimimo menesis");
 
             int maxDay = birth_month == 2 ? 28 : 31;
-            birth_day = getValidIntInput(1, maxDay, "Gimimo diena");
+            int birth_day = getValidIntInput(1, maxDay, "Gimimo diena");
 
             Contact newContact{name, surname, phone_number, birth_year, birth_month, birth_day};
             cl_add(contactList, numContacts, lastContactNum, newContact);
